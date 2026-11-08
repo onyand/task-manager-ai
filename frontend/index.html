@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#f5f6f2">
+	<title>Tasks | Daybook</title>
+	<style>
+		:root {
+			color-scheme: light;
+			--ink: #1c2927;
+			--muted: #71807a;
+			--line: #dce3de;
+			--paper: #f5f6f2;
+			--white: #fff;
+			--green: #2b705b;
+			--green-dark: #205442;
+			--coral: #c85d48;
+			font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+		}
+
+		* { box-sizing: border-box; }
+
+		body {
+			min-width: 320px;
+			min-height: 100vh;
+			margin: 0;
+			background: var(--paper);
+			color: var(--ink);
+		}
+
+		button, input { font: inherit; }
+
+		.page {
+			width: min(100% - 40px, 760px);
+			margin: 0 auto;
+			padding: 48px 0 64px;
+		}
+
+		.topline {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding-bottom: 18px;
+			border-bottom: 1px solid var(--line);
+			color: var(--muted);
+			font-size: 12px;
+			font-weight: 700;
+			letter-spacing: .12em;
+			text-transform: uppercase;
+		}
+
+		.brand { color: var(--green); }
+
+		header { padding: 48px 0 30px; }
+
+		h1 {
+			margin: 0;
+			font-family: Georgia, "Times New Roman", serif;
+			font-size: clamp(42px, 8vw, 64px);
+			font-weight: 400;
+			line-height: 1.05;
+		}
+
+		.date {
+			margin: 12px 0 0;
+			color: var(--muted);
+			font-size: 15px;
+		}
+
+		.composer {
+			display: flex;
+			gap: 10px;
+			padding: 8px;
+			border: 1px solid var(--line);
+			border-radius: 6px;
+			background: var(--white);
+			box-shadow: 0 8px 26px rgb(28 41 39 / 5%);
+		}
+
+		.composer input {
+			min-width: 0;
+			flex: 1;
+			padding: 12px 10px;
+			border: 0;
+			outline: 0;
+			color: var(--ink);
+			font-size: 16px;
+		}
+
+		.composer input::placeholder { color: #9aa59f; }
+
+		.add-button {
+			display: inline-flex;
+			min-height: 44px;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+			padding: 0 17px;
+			border: 0;
+			border-radius: 4px;
+			background: var(--green);
+			color: var(--white);
+			cursor: pointer;
+			font-size: 14px;
+			font-weight: 700;
+			transition: background .16s ease, transform .16s ease;
+		}
+
+		.add-button:hover { background: var(--green-dark); }
+		.add-button:active { transform: translateY(1px); }
+
+		button:focus-visible, input:focus-visible {
+			outline: 3px solid #e6a184;
+			outline-offset: 3px;
+		}
+
+		.list-heading {
+			display: flex;
+			align-items: baseline;
+			justify-content: space-between;
+			margin: 38px 0 12px;
+		}
+
+		h2 {
+			margin: 0;
+			font-size: 12px;
+			font-weight: 700;
+			letter-spacing: .12em;
+			text-transform: uppercase;
+		}
+
+		.count { color: var(--muted); font-size: 13px; }
+
+		.task-list {
+			margin: 0;
+			padding: 0;
+			border-top: 1px solid var(--line);
+			list-style: none;
+		}
+
+		.task {
+			display: flex;
+			min-height: 64px;
+			align-items: center;
+			gap: 14px;
+			border-bottom: 1px solid var(--line);
+			animation: arrive .22s ease-out both;
+		}
+
+		.task-toggle {
+			width: 20px;
+			height: 20px;
+			flex: 0 0 20px;
+			margin: 0;
+			accent-color: var(--green);
+			cursor: pointer;
+		}
+
+		.task-title {
+			min-width: 0;
+			flex: 1;
+			overflow-wrap: anywhere;
+			font-size: 15px;
+			line-height: 1.45;
+		}
+
+		.task.done .task-title {
+			color: var(--muted);
+			text-decoration: line-through;
+		}
+
+		.delete-button {
+			display: grid;
+			width: 36px;
+			height: 36px;
+			flex: 0 0 36px;
+			place-items: center;
+			border: 0;
+			border-radius: 4px;
+			background: transparent;
+			color: var(--muted);
+			cursor: pointer;
+		}
+
+		.delete-button:hover { background: #f2e7e2; color: var(--coral); }
+
+		.empty-state {
+			padding: 27px 0;
+			color: var(--muted);
+			font-family: Georgia, "Times New Roman", serif;
+			font-size: 18px;
+		}
+
+		@keyframes arrive {
+			from { opacity: 0; transform: translateY(5px); }
+			to { opacity: 1; transform: translateY(0); }
+		}
+
+		@media (max-width: 520px) {
+			.page { width: min(100% - 28px, 760px); padding-top: 26px; }
+			header { padding-top: 38px; }
+			.composer { gap: 4px; }
+			.add-button { padding: 0 12px; }
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			*, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+		}
+	</style>
+</head>
+<body>
+	<main class="page">
+		<div class="topline">
+			<span class="brand">Daybook</span>
+			<span>Task list</span>
+		</div>
+
+		<header>
+			<h1>Make room<br>for what matters.</h1>
+			<p class="date" id="today"></p>
+		</header>
+
+		<form class="composer" id="task-form">
+			<input id="task-input" name="task" type="text" placeholder="What needs doing?" maxlength="180" autocomplete="off" required aria-label="New task">
+			<button class="add-button" type="submit"><span aria-hidden="true">+</span> Add task</button>
+		</form>
+
+		<section aria-labelledby="list-title">
+			<div class="list-heading">
+				<h2 id="list-title">Your tasks</h2>
+				<span class="count" id="task-count" aria-live="polite"></span>
+			</div>
+			<ul class="task-list" id="task-list" aria-label="Tasks"></ul>
+			<p class="empty-state" id="empty-state">A clear list is a good place to start.</p>
+		</section>
+	</main>
+
+	<script>
+		const storageKey = "daybook.tasks";
+		const form = document.querySelector("#task-form");
+		const input = document.querySelector("#task-input");
+		const list = document.querySelector("#task-list");
+		const emptyState = document.querySelector("#empty-state");
+		const count = document.querySelector("#task-count");
+
+		document.querySelector("#today").textContent = new Intl.DateTimeFormat(undefined, {
+			weekday: "long",
+			month: "long",
+			day: "numeric"
+		}).format(new Date());
+
+		let tasks = loadTasks();
+
+		function loadTasks() {
+			try {
+				const saved = JSON.parse(localStorage.getItem(storageKey) || "[]");
+				return Array.isArray(saved) ? saved : [];
+			} catch {
+				return [];
+			}
+		}
+
+		function saveTasks() {
+			localStorage.setItem(storageKey, JSON.stringify(tasks));
+		}
+
+		function renderTasks() {
+			list.replaceChildren();
+			emptyState.hidden = tasks.length > 0;
+			const remaining = tasks.filter(task => !task.completed).length;
+			count.textContent = `${remaining} remaining`;
+
+			tasks.forEach(task => {
+				const item = document.createElement("li");
+				item.className = `task${task.completed ? " done" : ""}`;
+
+				const checkbox = document.createElement("input");
+				checkbox.className = "task-toggle";
+				checkbox.type = "checkbox";
+				checkbox.checked = task.completed;
+				checkbox.setAttribute("aria-label", `Mark ${task.title} as ${task.completed ? "not done" : "done"}`);
+				checkbox.addEventListener("change", () => {
+					task.completed = checkbox.checked;
+					saveTasks();
+					renderTasks();
+				});
+
+				const title = document.createElement("span");
+				title.className = "task-title";
+				title.textContent = task.title;
+
+				const remove = document.createElement("button");
+				remove.className = "delete-button";
+				remove.type = "button";
+				remove.setAttribute("aria-label", `Delete ${task.title}`);
+				remove.innerHTML = "<svg aria-hidden=\"true\" width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\"><path d=\"M4 7h16M10 11v6m4-6v6M5 7l1 14h12l1-14M9 7V4h6v3\"/></svg>";
+				remove.addEventListener("click", () => {
+					tasks = tasks.filter(current => current.id !== task.id);
+					saveTasks();
+					renderTasks();
+				});
+
+				item.append(checkbox, title, remove);
+				list.append(item);
+			});
+		}
+
+		form.addEventListener("submit", event => {
+			event.preventDefault();
+			const title = input.value.trim();
+			if (!title) return;
+
+			tasks.unshift({
+				id: globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`,
+				title,
+				completed: false
+			});
+			saveTasks();
+			renderTasks();
+			form.reset();
+			input.focus();
+		});
+
+		renderTasks();
+	</script>
+</body>
+</html>
